@@ -32,6 +32,14 @@ export default async function handler(
     ranges: ["Sheet1!A2:C"],
   });
   const data = response.data;
+  const values = data.valueRanges?.[0].values;
 
-  res.status(201).json({ data, result: "Feedback fetched successfully" });
+  const urls = (values || []).map((_, index) => {
+    return {
+      shortUrl: values?.[index]?.[0],
+      longUrl: values?.[index]?.[1],
+    };
+  });
+
+  res.status(201).json(urls);
 }
