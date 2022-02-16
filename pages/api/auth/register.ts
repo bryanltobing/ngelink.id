@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { v4 as uuidv4 } from "uuid";
+import { randomBytes, scryptSync } from "crypto";
 
 import { USERS_SPREADSHEET_ID } from "@server/constants";
 import { writeToGoogleSpreadsheet } from "@server/services";
@@ -7,7 +8,11 @@ import { writeToGoogleSpreadsheet } from "@server/services";
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const id = uuidv4();
   const email = req.body.email;
-  const password = req.body.password;
+  const password = scryptSync(
+    req.body.password,
+    randomBytes(16).toString("hex"),
+    32
+  ).toString("hex");
   const firstName = "Set Your";
   const lastName = "Name";
   const isEmailVerified = false;
@@ -16,7 +21,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
   if (req.method === "POST") {
     try {
-      writeToGoogleSpreadsheet({
+      await writeToGoogleSpreadsheet({
         spreadsheetId: USERS_SPREADSHEET_ID,
         range: "Sheet1!A2:H",
         values: [
@@ -30,6 +35,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           updatedAt,
         ],
       });
+
       res.send("User created");
     } catch (err) {
       res.send(JSON.stringify(err));
