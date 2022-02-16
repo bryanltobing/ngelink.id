@@ -6,7 +6,7 @@ import {
   GCP_PRIVATE_KEY,
   GCP_WRITE_SPREADSHEET_SCOPES,
   URLS_SPREADSHEET_ID,
-} from "../../src/constants";
+} from "../../src/server/constants";
 
 export default async function handler(
   req: NextApiRequest,
