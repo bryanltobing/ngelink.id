@@ -4,10 +4,10 @@ import { createTheme } from "@mui/material/styles";
 import { EmotionCache } from "@emotion/cache";
 import { CacheProvider } from "@emotion/react";
 
-import theme from "../src/theme";
+import theme from "../src/client/theme";
 
-import "../styles/globals.css";
-import createEmotionCache from "../src/createEmotionCache";
+import "../src/client/styles/globals.css";
+import createEmotionCache from "../src/client/createEmotionCache";
 import Head from "next/head";
 
 const clientSideEmotionCache = createEmotionCache();
