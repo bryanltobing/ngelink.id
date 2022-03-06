@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Box,
   Button,
@@ -7,12 +7,29 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import { Icon } from "@mui/material";
+import { useForm } from "react-hook-form";
 
 import AuthLayout from "@client/components/templates/AuthLayout";
 
 import { NextPageWithLayout } from "@client/types";
 
+type RegisterForm = {
+  email: string;
+  password: string;
+};
+
 const RegisterPage: NextPageWithLayout = () => {
+  const { register, handleSubmit } = useForm<RegisterForm>();
+
+  const [showPassword, setShowPassword] = useState(false);
+
+  const handleToggleShowPassword = () => {
+    setShowPassword((prevShowPassword) => !prevShowPassword);
+  };
+
+  const handleSubmitRegisterForm = handleSubmit((data) => console.log(data));
+
   return (
     <>
       <Box
@@ -28,14 +45,42 @@ const RegisterPage: NextPageWithLayout = () => {
             </Typography>
           </Box>
 
-          <Stack spacing={2} mb={3}>
-            <TextField label="Email" placeholder="email@email.com" />
-            <TextField label="Password" placeholder="**************" />
-          </Stack>
+          <form onSubmit={handleSubmitRegisterForm}>
+            <Stack spacing={2} mb={3}>
+              <TextField
+                {...register("email")}
+                label="Email"
+                placeholder="email@email.com"
+              />
+              <TextField
+                {...register("password")}
+                label="Password"
+                placeholder="**************"
+                type={showPassword ? "text" : "password"}
+                InputProps={{
+                  endAdornment: showPassword ? (
+                    <Icon
+                      sx={{ cursor: "pointer" }}
+                      onClick={handleToggleShowPassword}
+                    >
+                      visibility
+                    </Icon>
+                  ) : (
+                    <Icon
+                      sx={{ cursor: "pointer" }}
+                      onClick={handleToggleShowPassword}
+                    >
+                      visibility_off
+                    </Icon>
+                  ),
+                }}
+              />
+            </Stack>
 
-          <Button variant="contained" fullWidth>
-            SUBMIT
-          </Button>
+            <Button type="submit" variant="contained" fullWidth>
+              SUBMIT
+            </Button>
+          </form>
         </Paper>
       </Box>
     </>
