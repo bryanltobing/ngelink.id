@@ -1,16 +1,16 @@
 import type { AppProps } from "next/app";
 import Head from "next/head";
-import { NextPage } from "next";
 import { CssBaseline, ThemeProvider, createTheme } from "@mui/material";
 import { EmotionCache } from "@emotion/cache";
 import { CacheProvider } from "@emotion/react";
-import { ReactElement, ReactNode } from "react";
+
+import { wrapper } from "@client/redux";
+
+import theme from "@client/theme";
+import "@client/styles/globals.css";
+import createEmotionCache from "@client/createEmotionCache";
 
 import { NextPageWithLayout } from "@client/types";
-
-import theme from "../src/client/theme";
-import "../src/client/styles/globals.css";
-import createEmotionCache from "../src/client/createEmotionCache";
 
 const clientSideEmotionCache = createEmotionCache();
 const defaultTheme = createTheme(theme);
@@ -44,4 +44,4 @@ function MyApp({
   );
 }
 
-export default MyApp;
+export default wrapper.withRedux(MyApp);
