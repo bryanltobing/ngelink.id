@@ -9,8 +9,11 @@ import {
 } from "@mui/material";
 import { Icon } from "@mui/material";
 import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
 
 import AuthLayout from "@client/components/templates/AuthLayout";
+
+import { registerValidationSchema } from "@client/definitions/validationSchema";
 
 import { NextPageWithLayout } from "@client/types";
 
@@ -20,7 +23,13 @@ type RegisterForm = {
 };
 
 const RegisterPage: NextPageWithLayout = () => {
-  const { register, handleSubmit } = useForm<RegisterForm>();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<RegisterForm>({
+    resolver: yupResolver(registerValidationSchema),
+  });
 
   const [showPassword, setShowPassword] = useState(false);
 
@@ -51,6 +60,8 @@ const RegisterPage: NextPageWithLayout = () => {
                 {...register("email")}
                 label="Email"
                 placeholder="email@email.com"
+                error={!!errors.email}
+                helperText={errors.email?.message}
               />
               <TextField
                 {...register("password")}
@@ -74,6 +85,8 @@ const RegisterPage: NextPageWithLayout = () => {
                     </Icon>
                   ),
                 }}
+                error={!!errors.password}
+                helperText={errors.password?.message}
               />
             </Stack>
 
