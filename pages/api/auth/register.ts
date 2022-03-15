@@ -3,7 +3,10 @@ import { v4 as uuidv4 } from "uuid";
 import { randomBytes, scryptSync } from "crypto";
 
 import { USERS_SPREADSHEET_ID } from "@server/constants";
-import { writeToGoogleSpreadsheet } from "@server/services";
+import {
+  readOneFromGoogleSpreadsheet,
+  writeToGoogleSpreadsheet,
+} from "@server/services";
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const id = uuidv4();
@@ -19,8 +22,19 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const createdAt = new Date().toISOString();
   const updatedAt = new Date().toISOString();
 
+  const emailSheet = await readOneFromGoogleSpreadsheet({
+    spreadsheetId: USERS_SPREADSHEET_ID,
+    range: "Sheet1!B:B",
+  });
+
   if (req.method === "POST") {
     try {
+      if (
+        (emailSheet.data.values?.flat() || []).find((value) => value === email)
+      ) {
+        throw new Error("EMAIL_IS_USED");
+      }
+
       await writeToGoogleSpreadsheet({
         spreadsheetId: USERS_SPREADSHEET_ID,
         range: "Sheet1!A2:H",
@@ -43,13 +57,15 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         },
         data: {},
       });
-    } catch (err) {
-      console.log(err);
+    } catch (err: unknown) {
+      const errorMessage = (err as { message?: string }).message;
+
       res.send({
         meta: {
           status: "error",
-          message: "SOMETHING_WENT_WRONG",
+          message: errorMessage ?? "SOMETHING_WENT_WRONG",
         },
+        data: {},
       });
     }
   } else {
@@ -58,6 +74,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         status: "error",
         message: "NOT_FOUND",
       },
+      data: {},
     });
   }
 };

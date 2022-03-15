@@ -50,5 +50,19 @@ export const readFromGoogleSpreadsheet = ({
   return googleSheets.spreadsheets.values.batchGet({
     spreadsheetId,
     ranges,
+    valueRenderOption: "FORMATTED_VALUE",
+  });
+};
+
+export const readOneFromGoogleSpreadsheet = ({
+  spreadsheetId,
+  range,
+}: {
+  spreadsheetId: string;
+  range: string;
+}) => {
+  return googleSheets.spreadsheets.values.get({
+    spreadsheetId,
+    range,
   });
 };

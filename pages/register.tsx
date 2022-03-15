@@ -25,6 +25,7 @@ const RegisterPage: NextPageWithLayout = () => {
     register,
     handleSubmit,
     formState: { errors },
+    setError,
   } = useForm<RegisterFormValues>({
     resolver: yupResolver(registerValidationSchema),
   });
@@ -44,6 +45,10 @@ const RegisterPage: NextPageWithLayout = () => {
 
     if (meta.status === "success") {
       router.push("/login");
+    } else if (meta.status === "error" && meta.message === "EMAIL_IS_USED") {
+      setError("email", {
+        message: "Email you try to register already in used",
+      });
     }
   };
 
