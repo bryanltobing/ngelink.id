@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import { Box, Paper, Stack, TextField, Typography } from "@mui/material";
-import { Icon } from "@mui/material";
-import { useForm } from "react-hook-form";
+import { Box, Paper, Stack, TextField, Typography, Icon } from "@mui/material";
+import { SubmitHandler, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { useRouter } from "next/router";
 
 import AuthLayout from "@client/components/templates/AuthLayout";
 import { Button } from "@components/atoms";
@@ -19,6 +19,8 @@ type RegisterFormValues = {
 };
 
 const RegisterPage: NextPageWithLayout = () => {
+  const router = useRouter();
+
   const {
     register,
     handleSubmit,
@@ -35,9 +37,15 @@ const RegisterPage: NextPageWithLayout = () => {
 
   const [registerMutation, { isLoading }] = useRegisterMutation();
 
-  const handleSubmitRegisterForm = handleSubmit((data) => {
-    registerMutation(data);
-  });
+  const handleSubmitRegisterForm: SubmitHandler<RegisterFormValues> = async (
+    data
+  ) => {
+    const { meta } = await registerMutation(data).unwrap();
+
+    if (meta.status === "success") {
+      router.push("/login");
+    }
+  };
 
   return (
     <>
@@ -54,7 +62,7 @@ const RegisterPage: NextPageWithLayout = () => {
             </Typography>
           </Box>
 
-          <form onSubmit={handleSubmitRegisterForm}>
+          <form onSubmit={handleSubmit(handleSubmitRegisterForm)}>
             <Stack spacing={2} mb={3}>
               <TextField
                 {...register("email")}

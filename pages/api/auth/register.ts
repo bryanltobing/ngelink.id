@@ -36,7 +36,13 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         ],
       });
 
-      res.send("User created");
+      res.send({
+        meta: {
+          status: "success",
+          message: "USER_CREATED",
+        },
+        data: {},
+      });
     } catch (err) {
       console.log(err);
       res.send(JSON.stringify(err));
