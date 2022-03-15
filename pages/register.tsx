@@ -1,25 +1,21 @@
 import React, { useState } from "react";
-import {
-  Box,
-  Button,
-  Paper,
-  Stack,
-  TextField,
-  Typography,
-} from "@mui/material";
+import { Box, Paper, Stack, TextField, Typography } from "@mui/material";
 import { Icon } from "@mui/material";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 
 import AuthLayout from "@client/components/templates/AuthLayout";
+import { Button } from "@components/atoms";
 
 import { registerValidationSchema } from "@client/definitions/validationSchema";
 
 import { NextPageWithLayout } from "@client/types";
+import { useRegisterMutation } from "@client/redux/modules/auth";
 
-type RegisterForm = {
+type RegisterFormValues = {
   email: string;
   password: string;
+  confirmationPassword: string;
 };
 
 const RegisterPage: NextPageWithLayout = () => {
@@ -27,7 +23,7 @@ const RegisterPage: NextPageWithLayout = () => {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<RegisterForm>({
+  } = useForm<RegisterFormValues>({
     resolver: yupResolver(registerValidationSchema),
   });
 
@@ -37,7 +33,11 @@ const RegisterPage: NextPageWithLayout = () => {
     setShowPassword((prevShowPassword) => !prevShowPassword);
   };
 
-  const handleSubmitRegisterForm = handleSubmit((data) => console.log(data));
+  const [registerMutation, { isLoading }] = useRegisterMutation();
+
+  const handleSubmitRegisterForm = handleSubmit((data) => {
+    registerMutation(data);
+  });
 
   return (
     <>
@@ -62,6 +62,7 @@ const RegisterPage: NextPageWithLayout = () => {
                 placeholder="email@email.com"
                 error={!!errors.email}
                 helperText={errors.email?.message}
+                disabled={isLoading}
               />
               <TextField
                 {...register("password")}
@@ -87,10 +88,42 @@ const RegisterPage: NextPageWithLayout = () => {
                 }}
                 error={!!errors.password}
                 helperText={errors.password?.message}
+                disabled={isLoading}
+              />
+              <TextField
+                {...register("confirmationPassword")}
+                label="Confirmation Passowrd"
+                placeholder="Retype Password"
+                type={showPassword ? "text" : "password"}
+                InputProps={{
+                  endAdornment: showPassword ? (
+                    <Icon
+                      sx={{ cursor: "pointer" }}
+                      onClick={handleToggleShowPassword}
+                    >
+                      visibility
+                    </Icon>
+                  ) : (
+                    <Icon
+                      sx={{ cursor: "pointer" }}
+                      onClick={handleToggleShowPassword}
+                    >
+                      visibility_off
+                    </Icon>
+                  ),
+                }}
+                error={!!errors.confirmationPassword}
+                helperText={errors.confirmationPassword?.message}
+                disabled={isLoading}
               />
             </Stack>
 
-            <Button type="submit" variant="contained" fullWidth>
+            <Button
+              type="submit"
+              variant="contained"
+              fullWidth
+              isLoading={isLoading}
+            >
               SUBMIT
             </Button>
           </form>

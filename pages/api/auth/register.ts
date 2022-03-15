@@ -38,6 +38,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
       res.send("User created");
     } catch (err) {
+      console.log(err);
       res.send(JSON.stringify(err));
     }
   } else {
