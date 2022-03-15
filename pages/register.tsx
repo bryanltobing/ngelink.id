@@ -4,7 +4,7 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useRouter } from "next/router";
 
-import AuthLayout from "@client/components/templates/AuthLayout";
+import { AuthLayout } from "@components/templates";
 import { Button } from "@components/atoms";
 
 import { registerValidationSchema } from "@client/definitions/validationSchema";

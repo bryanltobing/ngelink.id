@@ -1,12 +1,10 @@
-import { Box } from "@mui/material";
+import Box from "@mui/material/Box";
 import React from "react";
 
-const AuthLayout: React.FC = ({ children }) => {
+export const AuthLayout: React.FC = ({ children }) => {
   return (
     <Box bgcolor="background.default" height="100vh">
       {children}
     </Box>
   );
 };
-
-export default AuthLayout;
