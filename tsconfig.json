@@ -20,6 +20,9 @@
       "@client/*": [
         "src/client/*"
       ],
+      "@components/*": [
+        "src/client/components/*"
+      ]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],

@@ -1,19 +1,25 @@
 import type { AppProps } from "next/app";
-import { CssBaseline, ThemeProvider } from "@mui/material";
-import { createTheme } from "@mui/material/styles";
+import Head from "next/head";
+import { CssBaseline, ThemeProvider, createTheme } from "@mui/material";
 import { EmotionCache } from "@emotion/cache";
 import { CacheProvider } from "@emotion/react";
 
-import theme from "../src/client/theme";
+import { wrapper } from "@client/redux";
 
-import "../src/client/styles/globals.css";
-import createEmotionCache from "../src/client/createEmotionCache";
-import Head from "next/head";
+import theme from "@client/theme";
+import "@client/styles/globals.css";
+import createEmotionCache from "@client/createEmotionCache";
+
+import { NextPageWithLayout } from "@client/types";
 
 const clientSideEmotionCache = createEmotionCache();
 const defaultTheme = createTheme(theme);
 
-interface MyAppProps extends AppProps {
+type AppPropsWithLayout = AppProps & {
+  Component: NextPageWithLayout;
+};
+
+interface MyAppProps extends AppPropsWithLayout {
   emotionCache?: EmotionCache;
 }
 
@@ -22,6 +28,7 @@ function MyApp({
   pageProps,
   emotionCache = clientSideEmotionCache,
 }: MyAppProps) {
+  const getLayout = Component.getLayout ?? ((page) => page);
   return (
     <>
       <Head>
@@ -30,11 +37,11 @@ function MyApp({
       <CacheProvider value={emotionCache}>
         <ThemeProvider theme={defaultTheme}>
           <CssBaseline />
-          <Component {...pageProps} />
+          {getLayout(<Component {...pageProps} />)}
         </ThemeProvider>
       </CacheProvider>
     </>
   );
 }
 
-export default MyApp;
+export default wrapper.withRedux(MyApp);

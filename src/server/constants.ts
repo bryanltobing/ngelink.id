@@ -1,4 +1,5 @@
-export const URLS_SPREADSHEET_ID = process.env.URLS_SPREADSHEET_ID;
+export const URLS_SPREADSHEET_ID = process.env.URLS_SPREADSHEET_ID || "";
+export const USERS_SPREADSHEET_ID = process.env.USERS_SPREADSHEET_ID || "";
 
 export const GCP_CLIENT_ID = process.env.GCP_CLIENT_ID;
 export const GCP_PRIVATE_KEY = process.env.GCP_PRIVATE_KEY;
