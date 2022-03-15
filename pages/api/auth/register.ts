@@ -45,10 +45,20 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       });
     } catch (err) {
       console.log(err);
-      res.send(JSON.stringify(err));
+      res.send({
+        meta: {
+          status: "error",
+          message: "SOMETHING_WENT_WRONG",
+        },
+      });
     }
   } else {
-    res.send("Not Found");
+    res.send({
+      meta: {
+        status: "error",
+        message: "NOT_FOUND",
+      },
+    });
   }
 };
 
