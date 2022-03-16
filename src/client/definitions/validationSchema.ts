@@ -19,3 +19,11 @@ export const registerValidationSchema = Yup.object().shape({
       "Confirmation password must match password"
     ),
 });
+
+export const loginValidationSchema = Yup.object().shape({
+  email: Yup.string()
+    .trim()
+    .email("Email is invalid")
+    .required("Email must be filled"),
+  password: Yup.string().trim().required("Password must be filled"),
+});
