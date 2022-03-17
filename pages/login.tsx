@@ -6,6 +6,8 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { Button } from "@components/atoms";
 import { AuthLayout } from "@components/templates";
 
+import { useLoginMutation } from "@client/redux/modules/auth";
+
 import { loginValidationSchema } from "@definitions/validationSchema";
 
 import { NextPageWithLayout } from "@client/types";
@@ -30,9 +32,13 @@ const LoginPage: NextPageWithLayout = () => {
     setShowPassword((prevShowPassword) => !prevShowPassword);
   };
 
-  const handleSubmitLoginForm: SubmitHandler<LoginFormValues> = (data) => {};
+  const [login, { isLoading }] = useLoginMutation();
 
-  const isLoading = false;
+  const handleSubmitLoginForm: SubmitHandler<LoginFormValues> = async (
+    data
+  ) => {
+    login(data);
+  };
 
   return (
     <Box
