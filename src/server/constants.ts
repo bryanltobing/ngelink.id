@@ -9,3 +9,5 @@ export const GCP_WRITE_SPREADSHEET_SCOPES = [
   "https://www.googleapis.com/auth/drive.file",
   "https://www.googleapis.com/auth/spreadsheets",
 ];
+
+export const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY || "";

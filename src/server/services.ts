@@ -1,4 +1,5 @@
 import { google } from "googleapis";
+import { scryptSync, randomBytes } from "crypto";
 
 import {
   GCP_CLIENT_EMAIL,
@@ -65,4 +66,29 @@ export const readOneFromGoogleSpreadsheet = ({
     spreadsheetId,
     range,
   });
+};
+
+const encryptPassowrd = (password: string, salt: string) => {
+  return scryptSync(password, salt, 32).toString("hex");
+};
+
+/**
+ * Hash password with random salt
+ * @return {string} password hash followed by salt
+ *  XXXX till 64 XXXX till 32
+ *
+ */
+export const hashPassword = (password: string): string => {
+  const salt = randomBytes(16).toString("hex");
+  return encryptPassowrd(password, salt) + salt;
+};
+
+/**
+ * Match password against the stored hash
+ */
+export const matchPassword = (passowrd: string, hash: string): boolean => {
+  const salt = hash.slice(64);
+  const originalPassHash = hash.slice(0, 64);
+  const currentPassHash = encryptPassowrd(passowrd, salt);
+  return originalPassHash === currentPassHash;
 };
