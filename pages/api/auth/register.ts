@@ -1,49 +1,25 @@
-import type { NextApiRequest, NextApiResponse } from "next";
-import { v4 as uuidv4 } from "uuid";
+import type { NextApiHandler } from "next";
+import { PrismaClient } from "@prisma/client";
 
-import { USERS_SPREADSHEET_ID } from "@server/constants";
-import {
-  hashPassword,
-  readOneFromGoogleSpreadsheet,
-  writeToGoogleSpreadsheet,
-} from "@server/services";
+import { hashPassword } from "@server/services";
 
-const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-  const id = uuidv4();
-  const email = req.body.email;
-  const password = hashPassword(req.body.password);
-  const firstName = "Set Your";
-  const lastName = "Name";
-  const isEmailVerified = false;
-  const createdAt = new Date().toISOString();
-  const updatedAt = new Date().toISOString();
+const prisma = new PrismaClient();
 
-  const emailSheet = await readOneFromGoogleSpreadsheet({
-    spreadsheetId: USERS_SPREADSHEET_ID,
-    range: "Sheet1!B:B",
-  });
-
+const handler: NextApiHandler = async (req, res) => {
   if (req.method === "POST") {
+    const email = req.body.email;
+    const password = hashPassword(req.body.password);
+    const firstName = "Set Your";
+    const lastName = "Name";
     try {
-      if (
-        (emailSheet.data.values?.flat() || []).find((value) => value === email)
-      ) {
+      const userFound = await prisma.user.findUnique({ where: { email } });
+
+      if (userFound) {
         throw new Error("EMAIL_IS_USED");
       }
 
-      await writeToGoogleSpreadsheet({
-        spreadsheetId: USERS_SPREADSHEET_ID,
-        range: "Sheet1!A2:H",
-        values: [
-          id,
-          email,
-          password,
-          firstName,
-          lastName,
-          isEmailVerified,
-          createdAt,
-          updatedAt,
-        ],
+      await prisma.user.create({
+        data: { email, password, firstName, lastName },
       });
 
       res.send({
