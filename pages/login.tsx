@@ -2,8 +2,11 @@ import React, { ReactElement, useState } from "react";
 import { Box, Paper, Typography, Stack, TextField, Icon } from "@mui/material";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
+import cookies from "js-cookie";
+import { useRouter } from "next/router";
+import { GetServerSideProps } from "next";
 
-import { Button } from "@components/atoms";
+import { Button, Link } from "@components/atoms";
 import { AuthLayout } from "@components/templates";
 
 import { useLoginMutation } from "@client/redux/modules/auth";
@@ -18,6 +21,8 @@ type LoginFormValues = {
 };
 
 const LoginPage: NextPageWithLayout = () => {
+  const router = useRouter();
+
   const {
     register,
     handleSubmit,
@@ -37,7 +42,19 @@ const LoginPage: NextPageWithLayout = () => {
   const handleSubmitLoginForm: SubmitHandler<LoginFormValues> = async (
     data
   ) => {
-    login(data);
+    const {
+      data: { token },
+    } = await login(data).unwrap();
+
+    if (token) {
+      const inOneHour = new Date(new Date().getTime() + 60 * 60 * 1000);
+      cookies.set("ngelink-token", token, {
+        expires: inOneHour,
+        sameSite: "strict",
+      });
+
+      router.push("/");
+    }
   };
 
   return (
@@ -55,7 +72,7 @@ const LoginPage: NextPageWithLayout = () => {
         </Box>
 
         <form onSubmit={handleSubmit(handleSubmitLoginForm)}>
-          <Stack spacing={2} mb={3}>
+          <Stack spacing={2.5} mb={3}>
             <TextField
               {...register("email")}
               label="Email"
@@ -90,6 +107,13 @@ const LoginPage: NextPageWithLayout = () => {
               helperText={errors.password?.message}
               disabled={isLoading}
             />
+
+            <Typography variant="body2">
+              Not registered yet?{" "}
+              <Link href="/register" fontWeight="bold">
+                Sign Up
+              </Link>
+            </Typography>
           </Stack>
 
           <Button
@@ -111,3 +135,17 @@ LoginPage.getLayout = (page: ReactElement) => {
 };
 
 export default LoginPage;
+
+export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
+  const token = (req.cookies as { "ngelink-token": string })["ngelink-token"];
+
+  if (token) {
+    res.writeHead(307, { Location: "/" });
+    res.end();
+    return { props: {} };
+  }
+
+  return {
+    props: {},
+  };
+};

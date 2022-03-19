@@ -1,45 +1,35 @@
-import { NextApiRequest, NextApiResponse } from "next";
+import { NextApiHandler } from "next";
 import jwt from "jsonwebtoken";
+import { PrismaClient } from "@prisma/client";
 
-import { JWT_SECRET_KEY, USERS_SPREADSHEET_ID } from "@server/constants";
-import { matchPassword, readFromGoogleSpreadsheet } from "@server/services";
+import { JWT_SECRET_KEY } from "@server/constants";
+import { matchPassword } from "@server/services";
 
-const handler = async (req: NextApiRequest, res: NextApiResponse) => {
+import { omitKeys } from "@helpers";
+
+const prisma = new PrismaClient();
+
+const handler: NextApiHandler = async (req, res) => {
   if (req.method === "POST") {
     const email = req.body.email;
     const password = req.body.password;
 
-    const emailPasswordRows = await readFromGoogleSpreadsheet({
-      spreadsheetId: USERS_SPREADSHEET_ID,
-      ranges: ["Sheet1!A2:C"],
-    });
-
-    const emailPasswordValues = emailPasswordRows.data.valueRanges?.[0].values;
-
-    const emailPasswordList: { email: string; password: string }[] =
-      emailPasswordRows.data.valueRanges?.[0].values?.map((value, index) => {
-        return {
-          id: emailPasswordValues?.[index][0],
-          email: emailPasswordValues?.[index][1],
-          password: emailPasswordValues?.[index][2],
-        };
-      }) || [];
-
     try {
-      const result = emailPasswordList.find((list) => list.email === email);
+      const userFound = await prisma.user.findUnique({ where: { email } });
 
-      if (!result) {
+      if (!userFound) {
         throw new Error("LOGIN_INVALID");
       }
 
-      if (matchPassword(password, result.password)) {
+      if (matchPassword(password, userFound.password)) {
         const token = jwt.sign(
           {
             exp: Math.floor(Date.now() / 1000) + 60 * 60,
-            data: result,
+            data: omitKeys(userFound, ["password", "createdAt", "updatedAt"]),
           },
           JWT_SECRET_KEY
         );
+
         res.send({
           meta: {
             status: "success",

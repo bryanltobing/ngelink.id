@@ -25,6 +25,9 @@
       ],
       "@definitions/*": [
         "src/client/definitions/*"
+      ],
+      "@helpers": [
+        "src/helpers.ts"
       ]
     }
   },
