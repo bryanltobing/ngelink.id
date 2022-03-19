@@ -3,6 +3,7 @@ import { Box, Paper, Stack, TextField, Typography, Icon } from "@mui/material";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useRouter } from "next/router";
+import { GetServerSideProps } from "next";
 
 import { AuthLayout } from "@components/templates";
 import { Button } from "@components/atoms";
@@ -149,3 +150,17 @@ RegisterPage.getLayout = (page) => {
 };
 
 export default RegisterPage;
+
+export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
+  const token = (req.cookies as { "ngelink-token": string })["ngelink-token"];
+
+  if (token) {
+    res.writeHead(307, { Location: "/" });
+    res.end();
+    return { props: {} };
+  }
+
+  return {
+    props: {},
+  };
+};

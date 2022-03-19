@@ -4,6 +4,7 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import cookies from "js-cookie";
 import { useRouter } from "next/router";
+import { GetServerSideProps } from "next";
 
 import { Button } from "@components/atoms";
 import { AuthLayout } from "@components/templates";
@@ -127,3 +128,17 @@ LoginPage.getLayout = (page: ReactElement) => {
 };
 
 export default LoginPage;
+
+export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
+  const token = (req.cookies as { "ngelink-token": string })["ngelink-token"];
+
+  if (token) {
+    res.writeHead(307, { Location: "/" });
+    res.end();
+    return { props: {} };
+  }
+
+  return {
+    props: {},
+  };
+};
