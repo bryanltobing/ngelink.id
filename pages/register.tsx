@@ -6,7 +6,7 @@ import { useRouter } from "next/router";
 import { GetServerSideProps } from "next";
 
 import { AuthLayout } from "@components/templates";
-import { Button } from "@components/atoms";
+import { Button, Link } from "@components/atoms";
 
 import { registerValidationSchema } from "@client/definitions/validationSchema";
 
@@ -68,7 +68,7 @@ const RegisterPage: NextPageWithLayout = () => {
         </Box>
 
         <form onSubmit={handleSubmit(handleSubmitRegisterForm)}>
-          <Stack spacing={2} mb={3}>
+          <Stack spacing={2.5} mb={3}>
             <TextField
               {...register("email")}
               label="Email"
@@ -105,7 +105,7 @@ const RegisterPage: NextPageWithLayout = () => {
             />
             <TextField
               {...register("confirmationPassword")}
-              label="Confirmation Passowrd"
+              label="Confirmation Password"
               placeholder="Retype Password"
               type={showPassword ? "text" : "password"}
               InputProps={{
@@ -129,6 +129,13 @@ const RegisterPage: NextPageWithLayout = () => {
               helperText={errors.confirmationPassword?.message}
               disabled={isLoading}
             />
+
+            <Typography variant="body2">
+              Already have an account?{" "}
+              <Link href="/login" fontWeight="bold">
+                Sign In
+              </Link>
+            </Typography>
           </Stack>
 
           <Button

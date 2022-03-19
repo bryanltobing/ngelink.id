@@ -6,7 +6,7 @@ import cookies from "js-cookie";
 import { useRouter } from "next/router";
 import { GetServerSideProps } from "next";
 
-import { Button } from "@components/atoms";
+import { Button, Link } from "@components/atoms";
 import { AuthLayout } from "@components/templates";
 
 import { useLoginMutation } from "@client/redux/modules/auth";
@@ -72,7 +72,7 @@ const LoginPage: NextPageWithLayout = () => {
         </Box>
 
         <form onSubmit={handleSubmit(handleSubmitLoginForm)}>
-          <Stack spacing={2} mb={3}>
+          <Stack spacing={2.5} mb={3}>
             <TextField
               {...register("email")}
               label="Email"
@@ -107,6 +107,13 @@ const LoginPage: NextPageWithLayout = () => {
               helperText={errors.password?.message}
               disabled={isLoading}
             />
+
+            <Typography variant="body2">
+              Not registered yet?{" "}
+              <Link href="/register" fontWeight="bold">
+                Sign Up
+              </Link>
+            </Typography>
           </Stack>
 
           <Button
