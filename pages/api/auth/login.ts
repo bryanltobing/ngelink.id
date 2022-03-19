@@ -43,7 +43,7 @@ const handler: NextApiHandler = async (req, res) => {
     } catch (err: unknown) {
       const errorMessage = (err as { message?: string }).message;
 
-      res.send({
+      res.status(403).send({
         meta: {
           status: "error",
           message: errorMessage ?? "SOMETHING_WENT_WRONG",
@@ -52,7 +52,7 @@ const handler: NextApiHandler = async (req, res) => {
       });
     }
   } else {
-    res.send({
+    res.status(400).send({
       meta: {
         status: "error",
         message: "NOT_FOUND",

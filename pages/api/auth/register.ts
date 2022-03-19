@@ -41,7 +41,7 @@ const handler: NextApiHandler = async (req, res) => {
       });
     }
   } else {
-    res.send({
+    res.status(400).send({
       meta: {
         status: "error",
         message: "NOT_FOUND",

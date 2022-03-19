@@ -1,5 +1,13 @@
 import React, { ReactElement, useState } from "react";
-import { Box, Paper, Typography, Stack, TextField, Icon } from "@mui/material";
+import {
+  Box,
+  Paper,
+  Typography,
+  Stack,
+  TextField,
+  Icon,
+  Alert,
+} from "@mui/material";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import cookies from "js-cookie";
@@ -12,6 +20,7 @@ import { AuthLayout } from "@components/templates";
 import { useLoginMutation } from "@client/redux/modules/auth";
 
 import { loginValidationSchema } from "@definitions/validationSchema";
+import { getErrorMessage } from "@definitions/utils";
 
 import { NextPageWithLayout } from "@client/types";
 
@@ -37,7 +46,7 @@ const LoginPage: NextPageWithLayout = () => {
     setShowPassword((prevShowPassword) => !prevShowPassword);
   };
 
-  const [login, { isLoading }] = useLoginMutation();
+  const [login, { isLoading, error }] = useLoginMutation();
 
   const handleSubmitLoginForm: SubmitHandler<LoginFormValues> = async (
     data
@@ -64,68 +73,75 @@ const LoginPage: NextPageWithLayout = () => {
       justifyContent="center"
       height="100%"
     >
-      <Paper component={Box} width="100%" maxWidth={400}>
-        <Box mb={4}>
-          <Typography variant="h4" textAlign="center">
-            Sign In
-          </Typography>
-        </Box>
-
-        <form onSubmit={handleSubmit(handleSubmitLoginForm)}>
-          <Stack spacing={2.5} mb={3}>
-            <TextField
-              {...register("email")}
-              label="Email"
-              placeholder="email@email.com"
-              error={!!errors.email}
-              helperText={errors.email?.message}
-              disabled={isLoading}
-            />
-            <TextField
-              {...register("password")}
-              label="Password"
-              placeholder="**************"
-              type={showPassword ? "text" : "password"}
-              InputProps={{
-                endAdornment: showPassword ? (
-                  <Icon
-                    sx={{ cursor: "pointer" }}
-                    onClick={handleToggleShowPassword}
-                  >
-                    visibility
-                  </Icon>
-                ) : (
-                  <Icon
-                    sx={{ cursor: "pointer" }}
-                    onClick={handleToggleShowPassword}
-                  >
-                    visibility_off
-                  </Icon>
-                ),
-              }}
-              error={!!errors.password}
-              helperText={errors.password?.message}
-              disabled={isLoading}
-            />
-
-            <Typography variant="body2">
-              Not registered yet?{" "}
-              <Link href="/register" fontWeight="bold">
-                Sign Up
-              </Link>
+      <Box width="100%" maxWidth={400}>
+        {error && (
+          <Alert variant="filled" severity="error" sx={{ mb: 2 }}>
+            {getErrorMessage((error as any).data.meta.message)}
+          </Alert>
+        )}
+        <Paper component={Box}>
+          <Box mb={4}>
+            <Typography variant="h4" textAlign="center">
+              Sign In
             </Typography>
-          </Stack>
+          </Box>
 
-          <Button
-            type="submit"
-            variant="contained"
-            fullWidth
-            isLoading={isLoading}
-          >
-            SUBMIT
-          </Button>
-        </form>
-      </Paper>
+          <form onSubmit={handleSubmit(handleSubmitLoginForm)}>
+            <Stack spacing={2.5} mb={3}>
+              <TextField
+                {...register("email")}
+                label="Email"
+                placeholder="email@email.com"
+                error={!!errors.email}
+                helperText={errors.email?.message}
+                disabled={isLoading}
+              />
+              <TextField
+                {...register("password")}
+                label="Password"
+                placeholder="**************"
+                type={showPassword ? "text" : "password"}
+                InputProps={{
+                  endAdornment: showPassword ? (
+                    <Icon
+                      sx={{ cursor: "pointer" }}
+                      onClick={handleToggleShowPassword}
+                    >
+                      visibility
+                    </Icon>
+                  ) : (
+                    <Icon
+                      sx={{ cursor: "pointer" }}
+                      onClick={handleToggleShowPassword}
+                    >
+                      visibility_off
+                    </Icon>
+                  ),
+                }}
+                error={!!errors.password}
+                helperText={errors.password?.message}
+                disabled={isLoading}
+              />
+
+              <Typography variant="body2">
+                Not registered yet?{" "}
+                <Link href="/register" fontWeight="bold">
+                  Sign Up
+                </Link>
+              </Typography>
+            </Stack>
+
+            <Button
+              type="submit"
+              variant="contained"
+              fullWidth
+              isLoading={isLoading}
+            >
+              SUBMIT
+            </Button>
+          </form>
+        </Paper>
+      </Box>
     </Box>
   );
 };
