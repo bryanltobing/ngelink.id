@@ -1,30 +1,22 @@
 import type { GetServerSideProps, NextPage } from "next";
 import { Box } from "@mui/material";
-import { PrismaClient, User } from "@prisma/client";
-import { Fragment } from "react";
 
-const prisma = new PrismaClient();
+export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
+  const token = (req.cookies as { "ngelink-token": string })["ngelink-token"];
 
-export const getServerSideProps: GetServerSideProps = async ({ req }) => {
-  const users = await prisma.user.findMany();
+  if (!token) {
+    res.writeHead(307, { Location: "/auth/login" });
+    res.end();
+    return { props: {} };
+  }
 
   return {
-    props: { users },
+    props: {},
   };
 };
 
-const Home: NextPage<{ users: User[] }> = ({ users }) => {
-  return (
-    <Box>
-      {users.map((u) => (
-        <Fragment key={u.id}>
-          <h1>{u.firstName}</h1>
-          <p>{u.lastName}</p>
-          <p>{u.email}</p>
-        </Fragment>
-      ))}
-    </Box>
-  );
+const Home: NextPage = () => {
+  return <Box>Index</Box>;
 };
 
 export default Home;

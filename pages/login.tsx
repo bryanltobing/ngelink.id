@@ -2,6 +2,8 @@ import React, { ReactElement, useState } from "react";
 import { Box, Paper, Typography, Stack, TextField, Icon } from "@mui/material";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
+import cookies from "js-cookie";
+import { useRouter } from "next/router";
 
 import { Button } from "@components/atoms";
 import { AuthLayout } from "@components/templates";
@@ -18,6 +20,8 @@ type LoginFormValues = {
 };
 
 const LoginPage: NextPageWithLayout = () => {
+  const router = useRouter();
+
   const {
     register,
     handleSubmit,
@@ -37,7 +41,19 @@ const LoginPage: NextPageWithLayout = () => {
   const handleSubmitLoginForm: SubmitHandler<LoginFormValues> = async (
     data
   ) => {
-    login(data);
+    const {
+      data: { token },
+    } = await login(data).unwrap();
+
+    if (token) {
+      const inOneHour = new Date(new Date().getTime() + 60 * 60 * 1000);
+      cookies.set("ngelink-token", token, {
+        expires: inOneHour,
+        sameSite: "strict",
+      });
+
+      router.push("/");
+    }
   };
 
   return (
