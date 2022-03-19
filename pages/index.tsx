@@ -1,8 +1,25 @@
 import type { GetServerSideProps, NextPage } from "next";
 import { Box } from "@mui/material";
+import cookies from "js-cookie";
+import { useRouter } from "next/router";
+
+import { Button } from "@components/atoms";
 
 const Home: NextPage = () => {
-  return <Box>Index</Box>;
+  const router = useRouter();
+
+  const handleLogout = () => {
+    cookies.remove("ngelink-token");
+    router.push("/login");
+  };
+
+  return (
+    <Box>
+      <Button variant="contained" onClick={handleLogout}>
+        Logout
+      </Button>
+    </Box>
+  );
 };
 
 export default Home;
