@@ -1,9 +1,9 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { v4 as uuidv4 } from "uuid";
-import { randomBytes, scryptSync } from "crypto";
 
 import { USERS_SPREADSHEET_ID } from "@server/constants";
 import {
+  hashPassword,
   readOneFromGoogleSpreadsheet,
   writeToGoogleSpreadsheet,
 } from "@server/services";
@@ -11,11 +11,7 @@ import {
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const id = uuidv4();
   const email = req.body.email;
-  const password = scryptSync(
-    req.body.password,
-    randomBytes(16).toString("hex"),
-    32
-  ).toString("hex");
+  const password = hashPassword(req.body.password);
   const firstName = "Set Your";
   const lastName = "Name";
   const isEmailVerified = false;

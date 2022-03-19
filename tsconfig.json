@@ -22,6 +22,9 @@
       ],
       "@components/*": [
         "src/client/components/*"
+      ],
+      "@definitions/*": [
+        "src/client/definitions/*"
       ]
     }
   },

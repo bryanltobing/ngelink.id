@@ -1,33 +1,29 @@
-import React, { useState } from "react";
-import { Box, Paper, Stack, TextField, Typography, Icon } from "@mui/material";
+import React, { ReactElement, useState } from "react";
+import { Box, Paper, Typography, Stack, TextField, Icon } from "@mui/material";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useRouter } from "next/router";
 
-import { AuthLayout } from "@components/templates";
 import { Button } from "@components/atoms";
+import { AuthLayout } from "@components/templates";
 
-import { registerValidationSchema } from "@client/definitions/validationSchema";
+import { useLoginMutation } from "@client/redux/modules/auth";
+
+import { loginValidationSchema } from "@definitions/validationSchema";
 
 import { NextPageWithLayout } from "@client/types";
-import { useRegisterMutation } from "@client/redux/modules/auth";
 
-type RegisterFormValues = {
+type LoginFormValues = {
   email: string;
   password: string;
-  confirmationPassword: string;
 };
 
-const RegisterPage: NextPageWithLayout = () => {
-  const router = useRouter();
-
+const LoginPage: NextPageWithLayout = () => {
   const {
     register,
     handleSubmit,
     formState: { errors },
-    setError,
-  } = useForm<RegisterFormValues>({
-    resolver: yupResolver(registerValidationSchema),
+  } = useForm<LoginFormValues>({
+    resolver: yupResolver(loginValidationSchema),
   });
 
   const [showPassword, setShowPassword] = useState(false);
@@ -36,20 +32,12 @@ const RegisterPage: NextPageWithLayout = () => {
     setShowPassword((prevShowPassword) => !prevShowPassword);
   };
 
-  const [registerMutation, { isLoading }] = useRegisterMutation();
+  const [login, { isLoading }] = useLoginMutation();
 
-  const handleSubmitRegisterForm: SubmitHandler<RegisterFormValues> = async (
+  const handleSubmitLoginForm: SubmitHandler<LoginFormValues> = async (
     data
   ) => {
-    const { meta } = await registerMutation(data).unwrap();
-
-    if (meta.status === "success") {
-      router.push("/login");
-    } else if (meta.status === "error" && meta.message === "EMAIL_IS_USED") {
-      setError("email", {
-        message: "Email you try to register already in used",
-      });
-    }
+    login(data);
   };
 
   return (
@@ -62,11 +50,11 @@ const RegisterPage: NextPageWithLayout = () => {
       <Paper component={Box} width="100%" maxWidth={400}>
         <Box mb={4}>
           <Typography variant="h4" textAlign="center">
-            Sign Up
+            Sign In
           </Typography>
         </Box>
 
-        <form onSubmit={handleSubmit(handleSubmitRegisterForm)}>
+        <form onSubmit={handleSubmit(handleSubmitLoginForm)}>
           <Stack spacing={2} mb={3}>
             <TextField
               {...register("email")}
@@ -102,32 +90,6 @@ const RegisterPage: NextPageWithLayout = () => {
               helperText={errors.password?.message}
               disabled={isLoading}
             />
-            <TextField
-              {...register("confirmationPassword")}
-              label="Confirmation Passowrd"
-              placeholder="Retype Password"
-              type={showPassword ? "text" : "password"}
-              InputProps={{
-                endAdornment: showPassword ? (
-                  <Icon
-                    sx={{ cursor: "pointer" }}
-                    onClick={handleToggleShowPassword}
-                  >
-                    visibility
-                  </Icon>
-                ) : (
-                  <Icon
-                    sx={{ cursor: "pointer" }}
-                    onClick={handleToggleShowPassword}
-                  >
-                    visibility_off
-                  </Icon>
-                ),
-              }}
-              error={!!errors.confirmationPassword}
-              helperText={errors.confirmationPassword?.message}
-              disabled={isLoading}
-            />
           </Stack>
 
           <Button
@@ -144,8 +106,8 @@ const RegisterPage: NextPageWithLayout = () => {
   );
 };
 
-RegisterPage.getLayout = (page) => {
+LoginPage.getLayout = (page: ReactElement) => {
   return <AuthLayout>{page}</AuthLayout>;
 };
 
-export default RegisterPage;
+export default LoginPage;
