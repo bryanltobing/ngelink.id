@@ -1,13 +1,11 @@
 import { NextApiHandler } from "next";
 import jwt from "jsonwebtoken";
-import { PrismaClient } from "@prisma/client";
 
+import prisma from "@prismaClient";
 import { JWT_SECRET_KEY } from "@server/constants";
 import { matchPassword } from "@server/services";
 
 import { omitKeys } from "@helpers";
-
-const prisma = new PrismaClient();
 
 const handler: NextApiHandler = async (req, res) => {
   if (req.method === "POST") {
