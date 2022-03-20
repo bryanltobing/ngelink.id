@@ -1,13 +1,11 @@
 import { NextApiHandler } from "next";
 import jwt from "jsonwebtoken";
-import { PrismaClient } from "@prisma/client";
 
+import prisma from "@prismaClient";
 import { JWT_SECRET_KEY } from "@server/constants";
 import { matchPassword } from "@server/services";
 
 import { omitKeys } from "@helpers";
-
-const prisma = new PrismaClient();
 
 const handler: NextApiHandler = async (req, res) => {
   if (req.method === "POST") {
@@ -43,7 +41,7 @@ const handler: NextApiHandler = async (req, res) => {
     } catch (err: unknown) {
       const errorMessage = (err as { message?: string }).message;
 
-      res.send({
+      res.status(403).send({
         meta: {
           status: "error",
           message: errorMessage ?? "SOMETHING_WENT_WRONG",
@@ -52,7 +50,7 @@ const handler: NextApiHandler = async (req, res) => {
       });
     }
   } else {
-    res.send({
+    res.status(400).send({
       meta: {
         status: "error",
         message: "NOT_FOUND",

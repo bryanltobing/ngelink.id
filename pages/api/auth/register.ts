@@ -1,9 +1,7 @@
 import type { NextApiHandler } from "next";
-import { PrismaClient } from "@prisma/client";
 
+import prisma from "@prismaClient";
 import { hashPassword } from "@server/services";
-
-const prisma = new PrismaClient();
 
 const handler: NextApiHandler = async (req, res) => {
   if (req.method === "POST") {
@@ -41,7 +39,7 @@ const handler: NextApiHandler = async (req, res) => {
       });
     }
   } else {
-    res.send({
+    res.status(400).send({
       meta: {
         status: "error",
         message: "NOT_FOUND",

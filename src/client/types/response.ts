@@ -5,3 +5,5 @@ export type Response<T> = {
   };
   data: T;
 };
+
+export type ErrorMessage = "LOGIN_INVALID";

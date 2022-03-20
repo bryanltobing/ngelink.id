@@ -1,3 +1,7 @@
+import jwt from "jsonwebtoken";
+
+import { JWT_SECRET_KEY } from "@server/constants";
+
 export const omitKeys = <T extends Record<string, unknown>, K extends keyof T>(
   obj: T | null | undefined,
   remove: Array<K>
@@ -17,4 +21,19 @@ export const omitKeys = <T extends Record<string, unknown>, K extends keyof T>(
     }
   }
   return result;
+};
+
+export const validateToken = <T>(
+  token: string,
+  type: "verify" | "decode"
+): T => {
+  try {
+    if (type === "verify") {
+      return jwt.verify(token, JWT_SECRET_KEY) as any;
+    } else {
+      return jwt.decode(token) as any;
+    }
+  } catch (err: any) {
+    return err;
+  }
 };
